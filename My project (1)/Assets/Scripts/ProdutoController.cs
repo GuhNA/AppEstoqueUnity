@@ -7,6 +7,15 @@ public class ProdutoController : MonoBehaviour
     public int id, amount;
     public string nome, type;
     int i = 0;
+    bool _isActive = false;
+
+    #region encapsulamento
+    public bool isActive
+    {
+        get { return _isActive; }
+        set { _isActive = value; }
+    }
+    #endregion
     DatabaseJson json;
     
     [Space(10)]
@@ -16,7 +25,7 @@ public class ProdutoController : MonoBehaviour
     public Button salvar;
 
     private void Awake() {
-        json = GetComponent<DatabaseJson>();    
+        json = FindObjectOfType<DatabaseJson>();    
     }
     void Start()
     {
@@ -29,6 +38,7 @@ public class ProdutoController : MonoBehaviour
     }
     public void AddProduto()
     {
+        print("entrei");
         id = int.Parse(inputs[0].text);
         type = boxType.captionText.text;
         amount = int.Parse(inputs[2].text);
@@ -51,38 +61,41 @@ public class ProdutoController : MonoBehaviour
 
     void TrocaCampo()
     {
-        if(Input.GetKeyDown(KeyCode.Tab))
+        if(isActive)
         {
-            if(!inputs[0].isFocused && i == 0)
-                {
-                    print("Entrei");
-                    inputs[0].Select();
-                }
-            else
+            if(Input.GetKeyDown(KeyCode.Tab))
             {
-                if(i < 2)
-                {
-                    i++;
-                    inputs[i].Select();
-                }
-                else if(i < 4)
-                {
-                    i++;
-                    boxType.value+=1;
-                }
+                if(!inputs[0].isFocused && i == 0)
+                    {
+                        print("Entrei");
+                        inputs[0].Select();
+                    }
                 else
                 {
+                    if(i < 2)
+                    {
+                        i++;
+                        inputs[i].Select();
+                    }
+                    else if(i < 4)
+                    {
+                        i++;
+                        boxType.value+=1;
+                    }
+                    else
+                    {
+                        i = 0;
+                        inputs[i].Select();
+                        boxType.value = 0;
+                    }
+                }
+                if(Input.GetKeyDown(KeyCode.Return))
+                {
+                    salvar.onClick.Invoke();
                     i = 0;
                     inputs[i].Select();
-                    boxType.value = 0;
                 }
             }
-        }
-        if(Input.GetKeyDown(KeyCode.Return))
-        {
-            salvar.onClick.Invoke();
-            i = 0;
-            inputs[i].Select();
         }
     }
     

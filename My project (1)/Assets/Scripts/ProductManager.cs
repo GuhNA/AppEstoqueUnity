@@ -1,17 +1,25 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using UnityEngine.XR;
 
 public class ProductManager : MonoBehaviour
 {
+
+    int index = 0, i = 0;
+    bool _isActive = false;
+    public bool isActive
+    {
+        get { return _isActive; }
+        set { _isActive = value; }
+    }
+
     [Header("Nome ou ID")]
-    public InputField prodName;
-    public InputField prodID;
+    public InputField[] nomeOrID;
 
     [Space(10)][Header("Caixas e quantidades")]
-    public InputField caixas;
-    public InputField quantidades;
-    int index = 0;
+
+    public InputField[] caixasOuQuantidades;
 
     [Space(10)]
     public Button metamorfo;
@@ -25,23 +33,35 @@ public class ProductManager : MonoBehaviour
     private void Start() {
 
         databaseJson = FindObjectOfType<DatabaseJson>();
-        caixas.contentType = InputField.ContentType.IntegerNumber;
-        quantidades.onValueChanged.AddListener(Sobras);
+        caixasOuQuantidades[0].contentType = InputField.ContentType.IntegerNumber;
+        caixasOuQuantidades[1].onValueChanged.AddListener(Sobras);
     }
 
-
+    private void Update() {
+        SelectCampo();
+    }
     public void FindProduct(int type)
     {
+        if(nomeOrID[0].text == "")
+        {
+            nomeOrID[0].text = "9999";
+        }
         for(int i = 0; i < databaseJson.banco.produtos.Length; i++)
         {
-            if (databaseJson.banco.produtos[i].id == int.Parse(prodID.text) || databaseJson.banco.produtos[i].nome == prodName.text)
+            if (databaseJson.banco.produtos[i].id == int.Parse(nomeOrID[0].text) || databaseJson.banco.produtos[i].nome == nomeOrID[1].text)
             {
                 index = i;
-                canvasController.AlterarProduto();
+                canvasController.AlterarProduto(canvasController.mainMenu);
                 if(type == 1)
+                {
                     metamorfo.GetComponentInChildren<Text>().text = "Adicionar";
+                    canvasController.AlterarProduto2nd();
+                }
                 else
+                {
                     metamorfo.GetComponentInChildren<Text>().text = "Remover";
+                    canvasController.AlterarProduto2nd();
+                }
 
 
             }
@@ -56,7 +76,7 @@ public class ProductManager : MonoBehaviour
     {
 
         int tempIndex = index;
-        int count = int.Parse(caixas.text) * 24 + int.Parse(quantidades.text);
+        int count = int.Parse(caixasOuQuantidades[0].text) * 24 + int.Parse(caixasOuQuantidades[1].text);
          if(type == 1)
             databaseJson.banco.produtos[tempIndex].amount += count;
          else
@@ -73,6 +93,28 @@ public class ProductManager : MonoBehaviour
             if(char.IsDigit(c)) numbers += c;
             if(int.Parse(numbers) > 23) numbers = "23";
         }
-        quantidades.text = numbers;
+        caixasOuQuantidades[1].text = numbers;
+    }
+
+    void SelectCampo()
+    {
+        if(isActive)
+        {
+            InputField[] inputs;
+            if(canvasController.alterarProduto.activeSelf)
+                inputs = nomeOrID;
+            else
+                inputs = caixasOuQuantidades;
+            if(Input.GetKeyDown(KeyCode.Tab))
+            {
+                if(i < 2)
+                    i++;
+                else
+                    i = 0;
+                inputs[i].Select();
+                
+            }
+        }
+
     }
 }
