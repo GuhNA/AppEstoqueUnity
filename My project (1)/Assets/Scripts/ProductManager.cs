@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
-using UnityEngine.XR;
 
 public class ProductManager : MonoBehaviour
 {
@@ -23,9 +22,9 @@ public class ProductManager : MonoBehaviour
 
     [Space(10)]
     public Button metamorfo;
-
     CanvasController canvasController;
     DatabaseJson databaseJson;
+
     private void Awake() {
         canvasController = FindObjectOfType<CanvasController>();
     }
@@ -107,7 +106,7 @@ public class ProductManager : MonoBehaviour
                 inputs = caixasOuQuantidades;
             if(Input.GetKeyDown(KeyCode.Tab))
             {
-                if(i < 2)
+                if(i < 1)
                     i++;
                 else
                     i = 0;

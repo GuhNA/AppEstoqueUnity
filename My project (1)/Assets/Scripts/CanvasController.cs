@@ -2,12 +2,15 @@ using UnityEngine;
 
 public class CanvasController : MonoBehaviour
 {
-    public GameObject alterarProduto2, criarProduto, alterarProduto, mainMenu;
+    public GameObject alterarProduto2, criarProduto, alterarProduto, visualizarLista, mainMenu;
     public ProdutoController prodController;
     ProductManager productManager;
 
+    public LoadProducts loadProducts;
+
     private void Awake() {
         productManager = FindObjectOfType<ProductManager>();
+        loadProducts = FindObjectOfType<LoadProducts>();
     }
 
 
@@ -33,6 +36,14 @@ public class CanvasController : MonoBehaviour
         prodController.isActive = true;
     }
 
+    public void AddList()
+    {
+        mainMenu.SetActive(false);
+        loadProducts.LoadList();
+        visualizarLista.SetActive(true);
+
+
+    }
     public void MenuInicial()
     {
         mainMenu.SetActive(true);

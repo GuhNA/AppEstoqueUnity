@@ -56,6 +56,9 @@ public class ProdutoController : MonoBehaviour
             input.text = "";
 
         json.AdicionarProdutoAoJSON();
+        i = 0;
+        inputs[i].Select();
+        boxType.value = 0;
     }
 
 
@@ -65,6 +68,7 @@ public class ProdutoController : MonoBehaviour
         {
             if(Input.GetKeyDown(KeyCode.Tab))
             {
+                print(i);
                 if(!inputs[0].isFocused && i == 0)
                     {
                         print("Entrei");
@@ -89,12 +93,10 @@ public class ProdutoController : MonoBehaviour
                         boxType.value = 0;
                     }
                 }
-                if(Input.GetKeyDown(KeyCode.Return))
-                {
-                    salvar.onClick.Invoke();
-                    i = 0;
-                    inputs[i].Select();
-                }
+            }
+            if(Input.GetKeyDown(KeyCode.Return))
+            {
+                salvar.onClick.Invoke();
             }
         }
     }
