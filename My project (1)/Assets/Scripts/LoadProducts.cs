@@ -6,9 +6,11 @@ using UnityEngine.UI;
 public class LoadProducts : MonoBehaviour
 {
     GridLayoutGroup idBlock;
-
+    public int redValue;
     public GameObject prodPrefab, idBox, typeBox, nomeBox, quantBox;
+
     public RectTransform content;
+
 
     DatabaseJson json;
 
@@ -16,13 +18,10 @@ public class LoadProducts : MonoBehaviour
         json = GetComponent<DatabaseJson>();
         idBlock = idBox.GetComponent<GridLayoutGroup>();
     }
-
     public void PainelTamanho()
     {
-        int linhas = idBlock.transform.childCount / idBlock.constraintCount;
-        float alturaCelula = idBlock.cellSize.y + idBlock.spacing.y;
-        float novaAltura = (linhas-1) * alturaCelula;
-        print(novaAltura);
+        int linhas = json.banco.produtos.Length;
+        float novaAltura = linhas * idBlock.cellSize.y;
         content.sizeDelta = new Vector2(content.sizeDelta.x, novaAltura);
     }
 
@@ -90,6 +89,10 @@ public class LoadProducts : MonoBehaviour
             prodType.GetComponentInChildren<Text>().text = produto.type;
             GameObject prodQuant = Instantiate(prodPrefab, quantBox.transform);
             prodQuant.GetComponentInChildren<Text>().text = produto.amount.ToString();
+            GameObject[] prodStatus = new GameObject[4]{prodID, prodNome, prodType, prodQuant};
+            if(produto.amount <= redValue)
+                foreach (var prod in prodStatus) prod.GetComponentInChildren<Text>().color = Color.red;
+
         }
     }
 }

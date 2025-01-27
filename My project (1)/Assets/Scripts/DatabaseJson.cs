@@ -20,7 +20,6 @@ public class DatabaseJson : MonoBehaviour
             File.WriteAllText(filePath, jsonData);
         }
         jsonData = File.ReadAllText(filePath);
-        Debug.Log(jsonData);
 
         if(!string.IsNullOrWhiteSpace(jsonData))
             JsonUtility.FromJsonOverwrite(jsonData, banco);

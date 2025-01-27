@@ -50,5 +50,7 @@ public class CanvasController : MonoBehaviour
         criarProduto.SetActive(false);
         alterarProduto.SetActive(false);
         alterarProduto2.SetActive(false);
+        visualizarLista.SetActive(false);
+
     }
 }
