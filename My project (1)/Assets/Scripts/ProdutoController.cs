@@ -1,6 +1,7 @@
 using UnityEngine.UI;
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 
 public class ProdutoController : MonoBehaviour
 {
@@ -24,7 +25,9 @@ public class ProdutoController : MonoBehaviour
 
     public Button salvar;
 
+    Popup popup;
     private void Awake() {
+        popup = FindObjectOfType<Popup>();
         json = FindObjectOfType<DatabaseJson>();    
     }
     void Start()
@@ -38,27 +41,44 @@ public class ProdutoController : MonoBehaviour
     }
     public void AddProduto()
     {
-        print("entrei");
-        id = int.Parse(inputs[0].text);
-        type = boxType.captionText.text;
-        amount = int.Parse(inputs[2].text);
-        nome = inputs[1].text;
+        if(inputs[0].text != "" && inputs[1].text != "" && inputs[2].text != "")
+        {
+            foreach(var prod in json.banco.produtos)
+            {
+                if(prod.id.ToString() == inputs[0].text || prod.nome == inputs[1].text) 
+                {
+                    inputs[0].text = ""; inputs[1].text = ""; inputs[2].text = "";
+                    popup.AbrirPopup("Erro: Produto já existente!",true);
+                    return;
+                }
+            }
+            
+            id = int.Parse(inputs[0].text);
+            type = boxType.captionText.text;
+            amount = int.Parse(inputs[2].text);
+            nome = inputs[1].text;
+            Produto produto = new()
+            {
+                id = id,
+                nome = nome,
+                type = type,
+                amount = amount
+            };
 
-        Produto produto  = new();
-        produto.id = id;
-        produto.nome = nome;
-        produto.type = type;
-        produto.amount = amount;
 
+            json.banco.produtos.Append(produto);
+            foreach(var input in inputs)
+                input.text = "";
 
-        ArrayUtility.Add(ref json.banco.produtos, produto);
-        foreach(var input in inputs)
-            input.text = "";
-
-        json.AdicionarProdutoAoJSON();
-        i = 0;
-        inputs[i].Select();
-        boxType.value = 0;
+            json.AdicionarProdutoAoJSON(produto.id.ToString(), nome, produto.amount.ToString(), type);
+            i = 0;
+            inputs[i].Select();
+            boxType.value = 0;
+        }
+        else
+        {
+            popup.AbrirPopup("Erro: Campo Vazio!", true);
+        }
     }
 
 
@@ -71,7 +91,6 @@ public class ProdutoController : MonoBehaviour
                 print(i);
                 if(!inputs[0].isFocused && i == 0)
                     {
-                        print("Entrei");
                         inputs[0].Select();
                     }
                 else

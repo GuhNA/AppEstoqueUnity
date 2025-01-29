@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LoadProducts : MonoBehaviour
 {
-    GridLayoutGroup idBlock;
-    public int redValue;
+
+    int redValue;
     public GameObject prodPrefab, idBox, typeBox, nomeBox, quantBox;
 
     public RectTransform content;
@@ -16,18 +15,23 @@ public class LoadProducts : MonoBehaviour
 
     private void Awake() {
         json = GetComponent<DatabaseJson>();
-        idBlock = idBox.GetComponent<GridLayoutGroup>();
     }
-    public void PainelTamanho()
+    public void PainelTamanho(GridLayoutGroup block, RectTransform content, int tamBanco)
     {
-        int linhas = json.banco.produtos.Length;
-        float novaAltura = linhas * idBlock.cellSize.y;
+        float novaAltura = tamBanco  * block.cellSize.y;
         content.sizeDelta = new Vector2(content.sizeDelta.x, novaAltura);
     }
-
+    public void PainelTamanho(GridLayoutGroup block, RectTransform content, int tamBanco, int offset)
+    {
+        float novaAltura = tamBanco  * block.cellSize.y + offset;
+        content.sizeDelta = new Vector2(content.sizeDelta.x, novaAltura);
+    }
+    private void Start() {
+        redValue = json.banco.redValue;
+    }
 
     //Necessario para trabalhar com objetos complexos e realizar sorts
-    class OrdenadorID : IComparer<Produto>
+    class OrdenadorNome : IComparer<Produto>
     {
         public int Compare(Produto x, Produto y)
         {
@@ -49,9 +53,16 @@ public class LoadProducts : MonoBehaviour
                 }
             }
             return 0;
-
         }
     }
+    class OrdenadorQuantia : IComparer<Produto>
+    {
+        public int Compare(Produto x, Produto y)
+        {
+            return x.amount.CompareTo(y.amount);
+        }
+    }
+
 
     public void LoadList()
     {
@@ -66,14 +77,36 @@ public class LoadProducts : MonoBehaviour
 
         //Ordena em ID e separa entre as categorias.
         List<Produto> produtos= new(json.banco.produtos);
-        produtos.Sort(new OrdenadorID());
+        produtos.Sort(new OrdenadorNome());
         List<Produto> recheados = produtos.FindAll((produtos) => produtos.type == "Recheado");
         List<Produto> leite = produtos.FindAll((produtos) => produtos.type == "Leite");
         List<Produto> fruta = produtos.FindAll((produtos) => produtos.type == "Fruta");
         AddList(fruta);
         AddList(leite);
         AddList(recheados);
-        PainelTamanho();
+        PainelTamanho(idBox.GetComponent<GridLayoutGroup>(), content, json.banco.produtos.Length);
+    }
+    public void LoadList(GameObject nome, GameObject quantia, RectTransform content, GameObject textPrefab)
+    {
+        //Limpa lista
+        for(int i = 0; i < nome.transform.childCount; i++)
+        {
+            Destroy(nome.transform.GetChild(i).gameObject);
+            Destroy(quantia.transform.GetChild(i).gameObject);
+        }
+
+        //Ordena em ID e separa entre as categorias.
+        List<Produto> produtos= json.banco.AlmostEmpty(redValue);
+        produtos.Sort(new OrdenadorQuantia());
+        foreach(var produto in produtos)
+        {
+            GameObject prodNome = Instantiate(textPrefab, nome.transform);
+            prodNome.GetComponentInChildren<Text>().text = produto.nome;
+            GameObject prodQuant = Instantiate(prodPrefab, quantia.transform);
+            prodQuant.GetComponentInChildren<Text>().text = produto.amount.ToString();
+        }
+        
+        PainelTamanho(nome.GetComponent<GridLayoutGroup>(), content, produtos.Count, 10);
     }
 
 
@@ -81,7 +114,7 @@ public class LoadProducts : MonoBehaviour
     {
          foreach(var produto in type)
         {
-            GameObject prodID = Instantiate(prodPrefab, idBlock.transform);
+            GameObject prodID = Instantiate(prodPrefab, idBox.transform);
             prodID.GetComponentInChildren<Text>().text = produto.id.ToString();
             GameObject prodNome = Instantiate(prodPrefab, nomeBox.transform);
             prodNome.GetComponentInChildren<Text>().text = produto.nome;

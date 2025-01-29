@@ -8,7 +8,7 @@
         },
         {
             "id": 25,
-            "amount": 504,
+            "amount": 576,
             "type": "Recheado",
             "nome": "Ninhotella"
         },
@@ -168,5 +168,6 @@
             "type": "Fruta",
             "nome": "Morango F"
         }
-    ]
+    ],
+    "redValue": 72
 }

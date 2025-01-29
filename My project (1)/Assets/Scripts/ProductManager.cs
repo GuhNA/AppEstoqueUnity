@@ -1,20 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using System.Collections.Generic;
 
 public class ProductManager : MonoBehaviour
 {
 
-    int index = 0, i = 0;
-    bool _isActive = false;
-    public bool isActive
-    {
-        get { return _isActive; }
-        set { _isActive = value; }
-    }
-
+    int index = 0;
+    bool focusID;
     [Header("Nome ou ID")]
-    public InputField[] nomeOrID;
+    public InputField ID;
+    public Dropdown nome;
 
     [Space(10)][Header("Caixas e quantidades")]
 
@@ -25,63 +21,97 @@ public class ProductManager : MonoBehaviour
     CanvasController canvasController;
     DatabaseJson databaseJson;
 
+    Popup popup;
+
     private void Awake() {
+        popup = FindObjectOfType<Popup>();
         canvasController = FindObjectOfType<CanvasController>();
+        databaseJson = FindObjectOfType<DatabaseJson>();
     }
 
     private void Start() {
-
-        databaseJson = FindObjectOfType<DatabaseJson>();
         caixasOuQuantidades[0].contentType = InputField.ContentType.IntegerNumber;
         caixasOuQuantidades[1].onValueChanged.AddListener(Sobras);
+        caixasOuQuantidades[0].text = "1";
+        caixasOuQuantidades[1].text = "0";
     }
 
     private void Update() {
-        SelectCampo();
+        if(!focusID)
+        {
+            nomeSelected();
+            if(ID.isFocused) focusID = true;
+        }
+        if(focusID)
+        {
+            IDselected();
+            if(!ID.isFocused) focusID = false;
+        }
     }
+
     public void FindProduct(int type)
     {
-        if(nomeOrID[0].text == "")
+        if(type == 1)
+            metamorfo.GetComponentInChildren<Text>().text = "Adicionar";
+        else
+            metamorfo.GetComponentInChildren<Text>().text = "Remover";
+        if(ID.text != "")
         {
-            nomeOrID[0].text = "9999";
-        }
-        for(int i = 0; i < databaseJson.banco.produtos.Length; i++)
-        {
-            if (databaseJson.banco.produtos[i].id == int.Parse(nomeOrID[0].text) || databaseJson.banco.produtos[i].nome == nomeOrID[1].text)
+            for(int i = 0; i < databaseJson.banco.produtos.Length; i++)
             {
+                if (databaseJson.banco.produtos[i].id == int.Parse(ID.text))
+                {
                 index = i;
-                canvasController.AlterarProduto(canvasController.mainMenu);
-                if(type == 1)
-                {
-                    metamorfo.GetComponentInChildren<Text>().text = "Adicionar";
-                    canvasController.AlterarProduto2nd();
+                canvasController.AlterarProduto2nd();
                 }
-                else
+            }
+            if(index == 0)
+            {
+                popup.AbrirPopup("Nenhum Produto encontrado, verifique o ID!",true);
+                ID.Select();
+            }
+            
+        }
+        else if(nome.captionText.text != "")
+        {
+            for(int i = 0; i < databaseJson.banco.produtos.Length; i++)
+            {
+                if (databaseJson.banco.produtos[i].nome == nome.captionText.text)
                 {
-                    metamorfo.GetComponentInChildren<Text>().text = "Remover";
-                    canvasController.AlterarProduto2nd();
+                index = i;
+                canvasController.AlterarProduto2nd();
                 }
-
-
             }
         }
-        if(index == 0)
-            //Adicionar condição de erro
-            print("Não existe este produto no banco");
+        else
+        {
+            popup.AbrirPopup("Nenhum campo Preenchido!", true);
+            ID.Select();
+        }
     }
 
 
-    public void AlterarItem(int type)
+    public void AlterarItem()
     {
-
+        string textMorfo = "";
         int tempIndex = index;
         int count = int.Parse(caixasOuQuantidades[0].text) * 24 + int.Parse(caixasOuQuantidades[1].text);
-         if(type == 1)
+         if(metamorfo.GetComponentInChildren<Text>().text == "Adicionar")
+         {
             databaseJson.banco.produtos[tempIndex].amount += count;
+            textMorfo = "Quantidades adicionadas com sucesso!";
+         }
          else
+         {
             databaseJson.banco.produtos[tempIndex].amount -= count;
+            textMorfo = "Quantidades removidas com sucesso!";
+         }
         index = 0;
         databaseJson.SaveJSON();
+        popup.AbrirPopup(textMorfo, false);
+        caixasOuQuantidades[0].text = "1";
+        caixasOuQuantidades[1].text = "0";
+        canvasController.AlterarProduto(GameObject.Find("Alterar Produto 2"));
     }
 
     void Sobras(string input)
@@ -95,25 +125,20 @@ public class ProductManager : MonoBehaviour
         caixasOuQuantidades[1].text = numbers;
     }
 
-    void SelectCampo()
+    void IDselected(){ if(nome.captionText.text != "") nome.value = 0;}
+    void nomeSelected(){ if(ID.text != "") ID.text = "";}
+
+    public void LoadDropdown()
     {
-        if(isActive)
+        List<string> options = new()
         {
-            InputField[] inputs;
-            if(canvasController.alterarProduto.activeSelf)
-                inputs = nomeOrID;
-            else
-                inputs = caixasOuQuantidades;
-            if(Input.GetKeyDown(KeyCode.Tab))
-            {
-                if(i < 1)
-                    i++;
-                else
-                    i = 0;
-                inputs[i].Select();
-                
-            }
-        }
+            ""
+        };
+        foreach(var produto in databaseJson.banco.produtos) options.Add(produto.nome);
+        options.Sort();
+        nome.ClearOptions();
+        nome.AddOptions(options);
 
     }
+
 }

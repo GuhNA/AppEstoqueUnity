@@ -8,9 +8,12 @@ public class DatabaseJson : MonoBehaviour
     string jsonData;
     string filePath;
 
+    Popup popup;
+
     
 
     private void Awake() {
+        popup = FindObjectOfType<Popup>();
         filePath = Path.Combine(Application.streamingAssetsPath, jsonFileName);
         //Se não existir, criar um banco e guardar no JSON
         if (!File.Exists(filePath))
@@ -31,7 +34,7 @@ public class DatabaseJson : MonoBehaviour
     {
         File.WriteAllText(filePath, JsonUtility.ToJson(banco));
     }
-    public void AdicionarProdutoAoJSON()
+    public void AdicionarProdutoAoJSON(string id, string nome, string quantia, string type)
     {
         // Caminho do arquivo JSON
         filePath = Path.Combine(Application.streamingAssetsPath, jsonFileName);
@@ -46,11 +49,10 @@ public class DatabaseJson : MonoBehaviour
             {
                 //Serializar de volta para JSON
                 string updatedJsonData = JsonUtility.ToJson(banco, true);
-                Debug.Log(updatedJsonData);
                 //Salvar o arquivo
                 File.WriteAllText(filePath, updatedJsonData);
 
-                Debug.Log("Adicionado ao JSON!");
+                popup.AbrirPopup($"Adicionado: {id}, {nome}, {quantia}, {type}.", false);
             }
             else
             {
@@ -59,8 +61,6 @@ public class DatabaseJson : MonoBehaviour
             }
         }
         else
-        {
-            Debug.LogError("Arquivo JSON não encontrado!");
-        }
+            popup.AbrirPopup("Arquivo JSON não encontrado!",true);
     }
 }
