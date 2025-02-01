@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CanvasController : MonoBehaviour
@@ -69,13 +70,23 @@ public class CanvasController : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Escape))
         {
+            GameObject temp = null;
             GameObject[] pages = new GameObject[4] {alterarProduto2, criarProduto, alterarProduto, visualizarLista};
             foreach (GameObject page in pages)
             {
-                if(page.activeInHierarchy && !alterarProduto2.activeInHierarchy){ MenuInicial(page); break;}
-                else if(alterarProduto2.activeInHierarchy){ AlterarProduto(alterarProduto2); break;}
-                else Application.Quit();
+                if(page.activeInHierarchy) temp = page;
             }
+            if(temp != null)
+            {
+                if(temp.activeInHierarchy && !alterarProduto2.activeInHierarchy) MenuInicial(temp);
+                else if(alterarProduto2.activeInHierarchy)AlterarProduto(alterarProduto2);
+            }
+            else Sair();
         }
+    }
+
+    public void Sair()
+    {
+        Application.Quit();
     }
 }

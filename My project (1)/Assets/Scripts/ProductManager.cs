@@ -5,9 +5,7 @@ using System.Collections.Generic;
 
 public class ProductManager : MonoBehaviour
 {
-
-    int index = 0;
-    bool focusID;
+    int index = -1;
     [Header("Nome ou ID")]
     public InputField ID;
     public Dropdown nome;
@@ -21,9 +19,12 @@ public class ProductManager : MonoBehaviour
     CanvasController canvasController;
     DatabaseJson databaseJson;
 
+    LogJson log;
+
     Popup popup;
 
     private void Awake() {
+        log = FindObjectOfType<LogJson>(); 
         popup = FindObjectOfType<Popup>();
         canvasController = FindObjectOfType<CanvasController>();
         databaseJson = FindObjectOfType<DatabaseJson>();
@@ -37,16 +38,9 @@ public class ProductManager : MonoBehaviour
     }
 
     private void Update() {
-        if(!focusID)
-        {
-            nomeSelected();
-            if(ID.isFocused) focusID = true;
-        }
-        if(focusID)
-        {
-            IDselected();
-            if(!ID.isFocused) focusID = false;
-        }
+
+        if(ID.isFocused) IDselected();
+        nome.onValueChanged.AddListener(nomeSelected);
     }
 
     public void FindProduct(int type)
@@ -65,7 +59,7 @@ public class ProductManager : MonoBehaviour
                 canvasController.AlterarProduto2nd();
                 }
             }
-            if(index == 0)
+            if(index == -1)
             {
                 popup.AbrirPopup("Nenhum Produto encontrado, verifique o ID!",true);
                 ID.Select();
@@ -99,14 +93,16 @@ public class ProductManager : MonoBehaviour
          if(metamorfo.GetComponentInChildren<Text>().text == "Adicionar")
          {
             databaseJson.banco.produtos[tempIndex].amount += count;
-            textMorfo = "Quantidades adicionadas com sucesso!";
+            textMorfo = $"{databaseJson.banco.produtos[tempIndex].nome}: {databaseJson.banco.produtos[tempIndex].amount-count} + {count} = {databaseJson.banco.produtos[tempIndex].amount}";
+            log.LogTime($"Adicionados {count} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {databaseJson.banco.produtos[tempIndex].amount}");
          }
          else
          {
             databaseJson.banco.produtos[tempIndex].amount -= count;
-            textMorfo = "Quantidades removidas com sucesso!";
+            textMorfo = $"{databaseJson.banco.produtos[tempIndex].nome}: {databaseJson.banco.produtos[tempIndex].amount+count} - {count} = {databaseJson.banco.produtos[tempIndex].amount}";
+            log.LogTime($"Removidos {count} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {databaseJson.banco.produtos[tempIndex].amount}");
          }
-        index = 0;
+        index = -1;
         databaseJson.SaveJSON();
         popup.AbrirPopup(textMorfo, false);
         caixasOuQuantidades[0].text = "1";
@@ -126,7 +122,7 @@ public class ProductManager : MonoBehaviour
     }
 
     void IDselected(){ if(nome.captionText.text != "") nome.value = 0;}
-    void nomeSelected(){ if(ID.text != "") ID.text = "";}
+    void nomeSelected(int index){ if(ID.text != "") ID.text = "";}
 
     public void LoadDropdown()
     {

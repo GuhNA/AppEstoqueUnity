@@ -15,6 +15,7 @@ public class LoadProducts : MonoBehaviour
 
     private void Awake() {
         json = GetComponent<DatabaseJson>();
+        redValue = json.banco.redValue;
     }
     public void PainelTamanho(GridLayoutGroup block, RectTransform content, int tamBanco)
     {
@@ -25,9 +26,6 @@ public class LoadProducts : MonoBehaviour
     {
         float novaAltura = tamBanco  * block.cellSize.y + offset;
         content.sizeDelta = new Vector2(content.sizeDelta.x, novaAltura);
-    }
-    private void Start() {
-        redValue = json.banco.redValue;
     }
 
     //Necessario para trabalhar com objetos complexos e realizar sorts
@@ -81,9 +79,13 @@ public class LoadProducts : MonoBehaviour
         List<Produto> recheados = produtos.FindAll((produtos) => produtos.type == "Recheado");
         List<Produto> leite = produtos.FindAll((produtos) => produtos.type == "Leite");
         List<Produto> fruta = produtos.FindAll((produtos) => produtos.type == "Fruta");
+        List<Produto> zero = produtos.FindAll((produtos) => produtos.type == "Zero");
+        List<Produto> premium = produtos.FindAll((produtos) => produtos.type == "Premium");
         AddList(fruta);
         AddList(leite);
         AddList(recheados);
+        AddList(zero);
+        AddList(premium);
         PainelTamanho(idBox.GetComponent<GridLayoutGroup>(), content, json.banco.produtos.Length);
     }
     public void LoadList(GameObject nome, GameObject quantia, RectTransform content, GameObject textPrefab)

@@ -10,9 +10,12 @@ public class DatabaseJson : MonoBehaviour
 
     Popup popup;
 
+    LogJson log;
+
     
 
     private void Awake() {
+        log = FindObjectOfType<LogJson>(); 
         popup = FindObjectOfType<Popup>();
         filePath = Path.Combine(Application.streamingAssetsPath, jsonFileName);
         //Se não existir, criar um banco e guardar no JSON
@@ -52,7 +55,8 @@ public class DatabaseJson : MonoBehaviour
                 //Salvar o arquivo
                 File.WriteAllText(filePath, updatedJsonData);
 
-                popup.AbrirPopup($"Adicionado: {id}, {nome}, {quantia}, {type}.", false);
+                popup.AbrirPopup($"Criado: {id}, {nome}, {quantia}, {type}.", false);
+                log.LogTime($"Criado: {id}, {nome}, {quantia}, {type}.");
             }
             else
             {

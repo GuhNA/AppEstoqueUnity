@@ -2,6 +2,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using System.Collections.Generic;
 
 public class ProdutoController : MonoBehaviour
 {
@@ -66,7 +67,10 @@ public class ProdutoController : MonoBehaviour
             };
 
 
-            json.banco.produtos.Append(produto);
+            //Necessário transformar o banco em lista
+            List<Produto> attBanco = json.banco.produtos.ToList();
+            attBanco.Add(produto);
+            json.banco.produtos = attBanco.ToArray();
             foreach(var input in inputs)
                 input.text = "";
 
@@ -88,7 +92,6 @@ public class ProdutoController : MonoBehaviour
         {
             if(Input.GetKeyDown(KeyCode.Tab))
             {
-                print(i);
                 if(!inputs[0].isFocused && i == 0)
                     {
                         inputs[0].Select();
@@ -100,7 +103,7 @@ public class ProdutoController : MonoBehaviour
                         i++;
                         inputs[i].Select();
                     }
-                    else if(i < 4)
+                    else if(i < 7)
                     {
                         i++;
                         boxType.value+=1;
@@ -113,11 +116,24 @@ public class ProdutoController : MonoBehaviour
                     }
                 }
             }
+            if(i < 3)
+            {
+                if(inputs[0].isFocused) i = 0;
+                else if(inputs[1].isFocused) i = 1;
+                else if(inputs[2].isFocused) i = 2;
+            }
+            boxType.onValueChanged.AddListener(dropdownIndex);
             if(Input.GetKeyDown(KeyCode.Return))
             {
                 salvar.onClick.Invoke();
             }
+
         }
+    }
+    void dropdownIndex(int index)
+    {
+        if(index != 0)
+            i = 3 + index;
     }
     
 }
