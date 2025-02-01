@@ -68,12 +68,15 @@ public class LogJson : MonoBehaviour
     }
     void ResetLogs()
     {
-        //Calculando tempo em diferença de dias
-        TimeSpan diferença = DateTime.Today - DateTime.Parse(logBanco.logs.First().day);
-        if(diferença.Days > 6)
+        if(logBanco.logs.Length > 0)
         {
-            File.WriteAllText(filePath, "");
-            logBanco = new();
+            //Calculando tempo em diferença de dias
+            TimeSpan diferença = DateTime.Today - DateTime.Parse(logBanco.logs.First().day);
+            if(diferença.Days > 6)
+            {
+                File.WriteAllText(filePath, "");
+                logBanco = new();
+            }
         }
     }
 }

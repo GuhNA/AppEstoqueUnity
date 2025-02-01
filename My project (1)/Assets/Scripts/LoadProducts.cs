@@ -123,7 +123,9 @@ public class LoadProducts : MonoBehaviour
             GameObject prodType = Instantiate(prodPrefab, typeBox.transform);
             prodType.GetComponentInChildren<Text>().text = produto.type;
             GameObject prodQuant = Instantiate(prodPrefab, quantBox.transform);
-            prodQuant.GetComponentInChildren<Text>().text = produto.amount.ToString();
+            int caixas = produto.amount/24;
+            if(caixas > 0) prodQuant.GetComponentInChildren<Text>().text = $"{caixas} cxs + {produto.amount%24} uni";
+            else prodQuant.GetComponentInChildren<Text>().text = $"{produto.amount} uni";
             GameObject[] prodStatus = new GameObject[4]{prodID, prodNome, prodType, prodQuant};
             if(produto.amount <= redValue)
                 foreach (var prod in prodStatus) prod.GetComponentInChildren<Text>().color = Color.red;
