@@ -24,7 +24,7 @@ public class LoadProducts : MonoBehaviour
     }
     public void PainelTamanho(GridLayoutGroup block, RectTransform content, int tamBanco, int offset)
     {
-        float novaAltura = tamBanco  * block.cellSize.y + offset;
+        float novaAltura = tamBanco  * (block.cellSize.y +block.spacing.y) + offset;
         content.sizeDelta = new Vector2(content.sizeDelta.x, novaAltura);
     }
 
@@ -105,10 +105,12 @@ public class LoadProducts : MonoBehaviour
             GameObject prodNome = Instantiate(textPrefab, nome.transform);
             prodNome.GetComponentInChildren<Text>().text = produto.nome;
             GameObject prodQuant = Instantiate(prodPrefab, quantia.transform);
-            prodQuant.GetComponentInChildren<Text>().text = produto.amount.ToString();
+            int caixas = produto.amount/24;
+            if(caixas > 0) prodQuant.GetComponentInChildren<Text>().text = $"{caixas} cxs + {produto.amount%24} uni";
+            else prodQuant.GetComponentInChildren<Text>().text = $"{produto.amount} uni";
         }
         
-        PainelTamanho(nome.GetComponent<GridLayoutGroup>(), content, produtos.Count, 10);
+        PainelTamanho(nome.GetComponent<GridLayoutGroup>(), content, produtos.Count, 150);
     }
 
 

@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using System.Collections.Generic;
+using System;
+using System.Threading;
 
 public class ProductManager : MonoBehaviour
 {
@@ -19,6 +21,7 @@ public class ProductManager : MonoBehaviour
     CanvasController canvasController;
     DatabaseJson databaseJson;
 
+    bool active = false;
     LogJson log;
 
     Popup popup;
@@ -31,8 +34,8 @@ public class ProductManager : MonoBehaviour
     }
 
     private void Start() {
-        caixasOuQuantidades[0].contentType = InputField.ContentType.IntegerNumber;
-        caixasOuQuantidades[1].onValueChanged.AddListener(Sobras);
+        caixasOuQuantidades[1].onValueChanged.AddListener(valor=> Sobras(valor,true,1));
+        caixasOuQuantidades[0].onValueChanged.AddListener(valor=> Sobras(valor,false,0));
         caixasOuQuantidades[0].text = "1";
         caixasOuQuantidades[1].text = "0";
     }
@@ -91,34 +94,106 @@ public class ProductManager : MonoBehaviour
         int tempIndex = index;
         int count = int.Parse(caixasOuQuantidades[0].text) * 24 + int.Parse(caixasOuQuantidades[1].text);
          if(metamorfo.GetComponentInChildren<Text>().text == "Adicionar")
-         {
-            databaseJson.banco.produtos[tempIndex].amount += count;
-            textMorfo = $"{databaseJson.banco.produtos[tempIndex].nome}: {databaseJson.banco.produtos[tempIndex].amount-count} + {count} = {databaseJson.banco.produtos[tempIndex].amount}";
-            log.LogTime($"Adicionados {count} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {databaseJson.banco.produtos[tempIndex].amount}");
+         {  
+            databaseJson.banco.produtos[tempIndex].MaiorQZero(count);
+            int temp = databaseJson.banco.produtos[tempIndex].amount;          
+            textMorfo = $"{databaseJson.banco.produtos[tempIndex].nome}: {(temp-count)/24} cx(s) e {(temp-count)%24} uni(s) + "+ 
+                        $"{count/24} cx(s) e {count%24} unidade(s)  = {temp/24} cx(s) + {temp%24} uni(s)";
+            if(count%24 == 0)
+            {
+                if(temp%24 == 0) log.LogTime($"Adicionados {count/24} caixas de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas");
+                else log.LogTime($"Adicionados {count/24} caixas de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas + {temp%24} unidades.");
+            }
+            else
+            {
+                if(temp%24 == 0) log.LogTime($"Adicionados {count/24} caixas + {count%24} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas");
+                else  log.LogTime($"Adicionados {count/24} caixas + {count%24} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas + {temp%24} unidades.");
+            }
+            popup.AbrirPopup(textMorfo, false);
+            databaseJson.SaveJSON();
+            
          }
          else
          {
-            databaseJson.banco.produtos[tempIndex].amount -= count;
-            textMorfo = $"{databaseJson.banco.produtos[tempIndex].nome}: {databaseJson.banco.produtos[tempIndex].amount+count} - {count} = {databaseJson.banco.produtos[tempIndex].amount}";
-            log.LogTime($"Removidos {count} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {databaseJson.banco.produtos[tempIndex].amount}");
+            if(databaseJson.banco.produtos[tempIndex].amount < count) popup.AbrirPopup("Valor acima da quantia do estoque!", true);
+            else
+            {
+                databaseJson.banco.produtos[tempIndex].MaiorQZero(-count);
+                int temp = databaseJson.banco.produtos[tempIndex].amount;     
+                textMorfo = $"{databaseJson.banco.produtos[tempIndex].nome}: {(temp+count)/24} cx(s) e {(temp+count)%24} uni(s) - "+ 
+                        $"{count/24} cx(s) e {count%24} uni(s)  = {temp/24} cx(s) + {temp%24} uni(s)";
+                if(count%24 == 0)
+                {
+                    if(temp%24 == 0) log.LogTime($"Removidos {count/24} caixas de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas");
+                    else log.LogTime($"Removidos {count/24} caixas de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas + {temp%24} unidades.");
+                }
+                else
+                {
+                    if(temp%24 == 0) log.LogTime($"Removidos {count/24} caixas + {count%24} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas");
+                    else  log.LogTime($"Removidos {count/24} caixas + {count%24} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas + {temp%24} unidades.");
+                }
+                databaseJson.SaveJSON();
+                popup.AbrirPopup(textMorfo, false);
+            }
          }
         index = -1;
-        databaseJson.SaveJSON();
-        popup.AbrirPopup(textMorfo, false);
         caixasOuQuantidades[0].text = "1";
         caixasOuQuantidades[1].text = "0";
         canvasController.AlterarProduto(GameObject.Find("Alterar Produto 2"));
     }
 
-    void Sobras(string input)
+    void Sobras(string input, bool verifica,int i)
     {
+        //Lógica infernal pqp!!! <3
+
+        //Zera o numbers q irá receber o input
         string numbers ="";
+        //Caso seja vazio adicione zero
+        if(input == "") 
+        {
+            active = true;
+            caixasOuQuantidades[i].text = "0";
+        }
+
+        //trabalhará somente quando o active não estiver ativo
         foreach(char c in input)
         {
-            if(char.IsDigit(c)) numbers += c;
-            if(int.Parse(numbers) > 23) numbers = "23";
+            if(!active)
+            {
+                if(char.IsDigit(c)) numbers += c;
+            }
+            else break;
         }
-        caixasOuQuantidades[1].text = numbers;
+        //Pra casos de "sobras"
+        if(verifica) verifica24(numbers);
+
+        //Verifica se o individuo digitou "01, 10, 20, 10 etc..."
+        if(input.Length > 1 && active)
+        {
+            //Escolhe o número q não é zero
+            foreach(char number in input)
+            {
+                if(number != 0)
+                {
+                    caixasOuQuantidades[i].text = number.ToString();
+                    break;
+                }
+            }
+            //Permite adicionar novamente digitos, ativando o loop que recebe os inputs
+            active = false;
+        }
+    }
+
+    void verifica24(string numbers)
+    {
+        if(int.TryParse(numbers,out int a)) 
+        {
+            if(a > 23)
+            {
+                numbers = "23";
+                caixasOuQuantidades[1].text = numbers;
+            }
+        }
     }
 
     void IDselected(){ if(nome.captionText.text != "") nome.value = 0;}
@@ -134,7 +209,7 @@ public class ProductManager : MonoBehaviour
         options.Sort();
         nome.ClearOptions();
         nome.AddOptions(options);
-
     }
+    
 
 }

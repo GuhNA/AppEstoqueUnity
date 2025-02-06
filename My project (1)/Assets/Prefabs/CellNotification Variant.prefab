@@ -92,6 +92,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: CellNotification Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 6047984090856474185, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6047984090856474185, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 6047984090856474185, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.33962262
+      objectReference: {fileID: 0}
+    - target: {fileID: 6047984090856474185, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_Color.g
+      value: 0.33962262
+      objectReference: {fileID: 0}
+    - target: {fileID: 6047984090856474185, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.33962262
+      objectReference: {fileID: 0}
     - target: {fileID: 6847603737890620022, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -0.5999985
@@ -101,8 +121,24 @@ PrefabInstance:
       value: mousse maracuja
       objectReference: {fileID: 0}
     - target: {fileID: 8689557075203991368, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8689557075203991368, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8689557075203991368, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8689557075203991368, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
       propertyPath: m_FontData.m_FontSize
       value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 8689557075203991368, guid: d80db4f55e34b5e4d80bba09d7717bd1, type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

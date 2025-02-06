@@ -20,11 +20,11 @@ public class Popup : MonoBehaviour
     }
     public void AbrirPopup(string msg, bool erro)
     {
+        mensagem.text = msg;
         if(erro)
             mensagem.color = Color.red;
         else
             mensagem.color = Color.black;
-        mensagem.text = msg;
         popup.SetActive(true);
     }
     public void FecharPopup()
@@ -32,4 +32,6 @@ public class Popup : MonoBehaviour
         popup.SetActive(false);
         
     }
+
+    
 }
