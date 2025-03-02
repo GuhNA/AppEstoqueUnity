@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class LoadProducts : MonoBehaviour
 {
 
-    int redValue;
     public GameObject prodPrefab, idBox, typeBox, nomeBox, quantBox;
 
     public RectTransform content;
@@ -15,7 +14,6 @@ public class LoadProducts : MonoBehaviour
 
     private void Awake() {
         json = GetComponent<DatabaseJson>();
-        redValue = json.banco.redValue;
     }
     public void PainelTamanho(GridLayoutGroup block, RectTransform content, int tamBanco)
     {
@@ -98,7 +96,7 @@ public class LoadProducts : MonoBehaviour
         }
 
         //Ordena em ID e separa entre as categorias.
-        List<Produto> produtos= json.banco.AlmostEmpty(redValue);
+        List<Produto> produtos= json.banco.AlmostEmpty();
         produtos.Sort(new OrdenadorQuantia());
         foreach(var produto in produtos)
         {
@@ -129,8 +127,10 @@ public class LoadProducts : MonoBehaviour
             if(caixas > 0) prodQuant.GetComponentInChildren<Text>().text = $"{caixas} cxs + {produto.amount%24} uni";
             else prodQuant.GetComponentInChildren<Text>().text = $"{produto.amount} uni";
             GameObject[] prodStatus = new GameObject[4]{prodID, prodNome, prodType, prodQuant};
-            if(produto.amount <= redValue)
+            if(produto.amount <= json.banco.redValue)
+            {
                 foreach (var prod in prodStatus) prod.GetComponentInChildren<Text>().color = Color.red;
+            }
 
         }
     }

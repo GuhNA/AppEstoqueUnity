@@ -49,7 +49,7 @@ public class ProdutoController : MonoBehaviour
                 if(prod.id.ToString() == inputs[0].text || prod.nome == inputs[1].text) 
                 {
                     inputs[0].text = ""; inputs[1].text = ""; inputs[2].text = "";
-                    popup.AbrirPopup("Erro: Produto já existente!",true);
+                    popup.AbrirPopup("Erro: Produto já existente!",true, false);
                     return;
                 }
             }
@@ -81,7 +81,7 @@ public class ProdutoController : MonoBehaviour
         }
         else
         {
-            popup.AbrirPopup("Erro: Campo Vazio!", true);
+            popup.AbrirPopup("Erro: Campo Vazio!", true, false);
         }
     }
 
@@ -123,10 +123,9 @@ public class ProdutoController : MonoBehaviour
                 else if(inputs[2].isFocused) i = 2;
             }
             boxType.onValueChanged.AddListener(dropdownIndex);
-            if(Input.GetKeyDown(KeyCode.Return))
-            {
-                salvar.onClick.Invoke();
-            }
+            
+            if(popup.permiteEnter)
+                if(Input.GetKeyDown(KeyCode.Return)) salvar.onClick.Invoke();
 
         }
     }

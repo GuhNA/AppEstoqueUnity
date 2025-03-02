@@ -2,7 +2,7 @@
     "produtos": [
         {
             "id": 2,
-            "amount": 70,
+            "amount": 94,
             "type": "Recheado",
             "nome": "Abacaxi Ao Vinho"
         },
@@ -62,7 +62,7 @@
         },
         {
             "id": 51,
-            "amount": 20,
+            "amount": 164,
             "type": "Fruta",
             "nome": "Abacaxi"
         },
@@ -142,7 +142,7 @@
             "id": 15,
             "amount": 100,
             "type": "Recheado",
-            "nome": "Duo Kinder Ovo"
+            "nome": "Duo"
         },
         {
             "id": 14,
@@ -185,6 +185,30 @@
             "amount": 12,
             "type": "Recheado",
             "nome": "Teste"
+        },
+        {
+            "id": 114,
+            "amount": 4,
+            "type": "Recheado",
+            "nome": "Testett"
+        },
+        {
+            "id": 115,
+            "amount": 1,
+            "type": "Recheado",
+            "nome": "Tes"
+        },
+        {
+            "id": 1111,
+            "amount": 13,
+            "type": "Recheado",
+            "nome": "Asds"
+        },
+        {
+            "id": 98989,
+            "amount": 345,
+            "type": "Recheado",
+            "nome": "Rftdd"
         }
     ],
     "redValue": 72

@@ -1,15 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
 using System.Collections.Generic;
-using System;
-using System.Threading;
+using UnityEngine.EventSystems;
+using System.Collections;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 public class ProductManager : MonoBehaviour
 {
     int index = -1;
     [Header("Nome ou ID")]
-    public InputField ID;
+    public InputField ID, dropdownSelect;
     public Dropdown nome;
 
     [Space(10)][Header("Caixas e quantidades")]
@@ -26,26 +27,43 @@ public class ProductManager : MonoBehaviour
 
     Popup popup;
 
+    GameObject adicionarAP, removerAP, pai;
     private void Awake() {
         log = FindObjectOfType<LogJson>(); 
         popup = FindObjectOfType<Popup>();
         canvasController = FindObjectOfType<CanvasController>();
         databaseJson = FindObjectOfType<DatabaseJson>();
+        adicionarAP = ProcurarFilho(GameObject.Find("Canvas"), "Adicionar AP");
+        removerAP = ProcurarFilho(GameObject.Find("Canvas"), "Remover AP");
+        pai = ProcurarFilho(GameObject.Find("Canvas"), "Alterar Produto");
+        
     }
 
     private void Start() {
         caixasOuQuantidades[1].onValueChanged.AddListener(valor=> Sobras(valor,true,1));
         caixasOuQuantidades[0].onValueChanged.AddListener(valor=> Sobras(valor,false,0));
+        dropdownSelect.onValueChanged.AddListener(input => DropSelect(input));
+        dropdownSelect.contentType = InputField.ContentType.Name;
+        ID.contentType = InputField.ContentType.IntegerNumber;
         caixasOuQuantidades[0].text = "1";
         caixasOuQuantidades[1].text = "0";
     }
 
     private void Update() {
-
         if(ID.isFocused) IDselected();
         nome.onValueChanged.AddListener(nomeSelected);
+        
+        if(pai.activeInHierarchy)
+        {
+            if(Input.GetKeyDown(KeyCode.KeypadPlus)) adicionarAP.GetComponent<Button>().onClick.Invoke();
+            if(Input.GetKeyDown(KeyCode.KeypadMinus)) removerAP.GetComponent<Button>().onClick.Invoke();
+        }
+        if(canvasController.alterarProduto2.activeSelf) 
+        {
+            if(Input.GetKeyDown(KeyCode.Return) && popup.permiteEnter) metamorfo.onClick.Invoke();
+        }
+        TrocaCampo();
     }
-
     public void FindProduct(int type)
     {
         if(type == 1)
@@ -64,7 +82,7 @@ public class ProductManager : MonoBehaviour
             }
             if(index == -1)
             {
-                popup.AbrirPopup("Nenhum Produto encontrado, verifique o ID!",true);
+                popup.AbrirPopup("Nenhum Produto encontrado, verifique o ID!",true, false);
                 ID.Select();
             }
             
@@ -82,7 +100,7 @@ public class ProductManager : MonoBehaviour
         }
         else
         {
-            popup.AbrirPopup("Nenhum campo Preenchido!", true);
+            popup.AbrirPopup("Nenhum campo Preenchido!", true, false);
             ID.Select();
         }
     }
@@ -109,13 +127,13 @@ public class ProductManager : MonoBehaviour
                 if(temp%24 == 0) log.LogTime($"Adicionados {count/24} caixas + {count%24} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas");
                 else  log.LogTime($"Adicionados {count/24} caixas + {count%24} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas + {temp%24} unidades.");
             }
-            popup.AbrirPopup(textMorfo, false);
+            StartCoroutine(TimerPopup(textMorfo,false,false));
             databaseJson.SaveJSON();
             
          }
          else
          {
-            if(databaseJson.banco.produtos[tempIndex].amount < count) popup.AbrirPopup("Valor acima da quantia do estoque!", true);
+            if(databaseJson.banco.produtos[tempIndex].amount < count) popup.AbrirPopup("Valor acima da quantia do estoque!", true, false);
             else
             {
                 databaseJson.banco.produtos[tempIndex].MaiorQZero(-count);
@@ -133,7 +151,7 @@ public class ProductManager : MonoBehaviour
                     else  log.LogTime($"Removidos {count/24} caixas + {count%24} unidades de {databaseJson.banco.produtos[tempIndex].nome} totalizando {temp/24} caixas + {temp%24} unidades.");
                 }
                 databaseJson.SaveJSON();
-                popup.AbrirPopup(textMorfo, false);
+                StartCoroutine(TimerPopup(textMorfo,false,false));
             }
          }
         index = -1;
@@ -144,34 +162,24 @@ public class ProductManager : MonoBehaviour
 
     void Sobras(string input, bool verifica,int i)
     {
+        string numbers ="";
         //Lógica infernal pqp!!! <3
+        foreach(char c in input)
+            if(char.IsDigit(c)) numbers +=c;
 
         //Zera o numbers q irá receber o input
-        string numbers ="";
         //Caso seja vazio adicione zero
-        if(input == "") 
+        if(numbers == "") 
         {
             active = true;
-            caixasOuQuantidades[i].text = "0";
+            numbers = "0";
         }
-
-        //trabalhará somente quando o active não estiver ativo
-        foreach(char c in input)
-        {
-            if(!active)
-            {
-                if(char.IsDigit(c)) numbers += c;
-            }
-            else break;
-        }
-        //Pra casos de "sobras"
-        if(verifica) verifica24(numbers);
 
         //Verifica se o individuo digitou "01, 10, 20, 10 etc..."
-        if(input.Length > 1 && active)
+        if(numbers.Length > 1 && active)
         {
             //Escolhe o número q não é zero
-            foreach(char number in input)
+            foreach(char number in numbers)
             {
                 if(number != 0)
                 {
@@ -181,6 +189,12 @@ public class ProductManager : MonoBehaviour
             }
             //Permite adicionar novamente digitos, ativando o loop que recebe os inputs
             active = false;
+        }
+        else
+        {
+            if(!verifica) caixasOuQuantidades[i].text = numbers;
+            //Pra casos de "sobras"
+            else verifica24(numbers);
         }
     }
 
@@ -196,7 +210,7 @@ public class ProductManager : MonoBehaviour
         }
     }
 
-    void IDselected(){ if(nome.captionText.text != "") nome.value = 0;}
+    void IDselected(){ if(nome.captionText.text != "") dropdownSelect.text = "";}
     void nomeSelected(int index){ if(ID.text != "") ID.text = "";}
 
     public void LoadDropdown()
@@ -211,5 +225,70 @@ public class ProductManager : MonoBehaviour
         nome.AddOptions(options);
     }
     
+    void DropSelect(string input)
+    {
+        //Caso queira selecionar o texto caso esteja escrito errado automaticamente, porém fica meio chato.
+        //bool change = false;
+        for(int i = 0; i < nome.options.Count; i++)
+        {
+            if(Regex.IsMatch(nome.options[i].text, @$"\A{input}\w*"))
+            {
+              //change = true;
+                nome.value = i;
+                break;
+            }
+        }
+        
+        /*if(!change)
+        {
+            //Gambiarra do GPT para selecionar o texto inteiro dentro do InputField Legacy
+            dropdownSelect.caretPosition = dropdownSelect.text.Length;
+            dropdownSelect.selectionAnchorPosition = 0;
+        }*/
+    }
 
+    public void AbrirPopup()
+    {
+        string msg;
+        if(metamorfo.GetComponentInChildren<Text>().text == "Adicionar")
+            msg = $"Deseja Adicionar {caixasOuQuantidades[0].text}cx(s) e {caixasOuQuantidades[1].text}uni(s)?";
+        else
+            msg = $"Deseja Remover {caixasOuQuantidades[0].text}cx(s) e {caixasOuQuantidades[1].text}uni(s)?";
+        popup.AbrirPopup(msg,false, true);
+    }
+
+
+    void TrocaCampo()
+    {
+        if(canvasController.alterarProduto.activeInHierarchy)
+        {
+            if(Input.GetKeyDown(KeyCode.Tab)) 
+            {
+                if(ID.isFocused) dropdownSelect.Select();
+                else ID.Select();
+            }
+        }
+    }
+    //Por que se fez necessário essa função? Não queria referenciar 15 objs na unity.
+    //O Find só encontra objs ativos. Então aí está a resposta
+     GameObject ProcurarFilho(GameObject obj,string nome)
+    {
+
+        for(int i = 0; i < obj.transform.childCount; i++)
+        {
+            if(obj.transform.GetChild(i).name == nome) return obj.transform.GetChild(i).gameObject;
+            else
+            {
+                GameObject temp = ProcurarFilho(obj.transform.GetChild(i).gameObject, nome);
+                if(temp != null) return temp;
+            }
+        }
+        return null;
+    }
+
+    IEnumerator TimerPopup(string txt, bool erro, bool ctz)
+    {
+        yield return new WaitForSeconds(.25f);
+        popup.AbrirPopup(txt,erro,ctz);
+    }
 }

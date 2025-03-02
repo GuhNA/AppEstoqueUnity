@@ -55,7 +55,7 @@ public class DatabaseJson : MonoBehaviour
                 //Salvar o arquivo
                 File.WriteAllText(filePath, updatedJsonData);
 
-                popup.AbrirPopup($"Criado: {id}, {nome}, {quantia}, {type}.", false);
+                popup.AbrirPopup($"Criado: {id}, {nome}, {quantia}, {type}.", false, false);
                 log.LogTime($"Criado: {id}, {nome}, {quantia}, {type}.");
             }
             else
@@ -65,6 +65,6 @@ public class DatabaseJson : MonoBehaviour
             }
         }
         else
-            popup.AbrirPopup("Arquivo JSON não encontrado!",true);
+            popup.AbrirPopup("Arquivo JSON não encontrado!",true, false);
     }
 }

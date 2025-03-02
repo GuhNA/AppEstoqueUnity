@@ -2,25 +2,9 @@
     "logs": [
         {
             "logsDaily": [
-                "03/02/2025 23:06:27: Adicionados 1 caixas de Abacaxi Ao Vinho totalizando 1 caixas",
-                "03/02/2025 23:09:42: Adicionados 1 caixas de Abacaxi Ao Vinho totalizando 2 caixas",
-                "03/02/2025 23:10:48: Adicionados 1 caixas de Abacaxi Ao Vinho totalizando 3 caixas",
-                "03/02/2025 23:17:10: Removidos 1 caixas de Abacaxi Ao Vinho totalizando 2 caixas",
-                "03/02/2025 23:17:31: Adicionados 1 caixas de Abacaxi Ao Vinho totalizando 3 caixas",
-                "03/02/2025 23:18:59: Adicionados 1 caixas de Abacaxi Ao Vinho totalizando 4 caixas",
-                "03/02/2025 23:19:26: Removidos 1 caixas de Abacaxi Ao Vinho totalizando 3 caixas",
-                "03/02/2025 23:21:35: Adicionados 1 caixas + 14 unidades de Abacaxi Ao Vinho totalizando 4 caixas + 14 unidades.",
-                "03/02/2025 23:22:09: Removidos 1 caixas + 15 unidades de Abacaxi Ao Vinho totalizando 2 caixas + 23 unidades.",
-                "03/02/2025 23:23:59: Adicionados 0 caixas + 15 unidades de Abacaxi Ao Vinho totalizando 3 caixas + 14 unidades.",
-                "03/02/2025 23:24:52: Removidos 0 caixas + 16 unidades de Abacaxi Ao Vinho totalizando 2 caixas + 22 unidades."
+                "02/03/2025 12:33:05: Criado: 98989, Rftdd, 345, Recheado."
             ],
-            "day": "03/02/2025 00:00:00"
-        },
-        {
-            "logsDaily": [
-                "05/02/2025 22:53:53: Criado: 111, Teste, 12, Recheado."
-            ],
-            "day": "05/02/2025 00:00:00"
+            "day": "02/03/2025 00:00:00"
         }
     ]
 }

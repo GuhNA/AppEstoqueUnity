@@ -33,7 +33,8 @@ public class CanvasController : MonoBehaviour
     {
         productManager.LoadDropdown();
         alterarProduto.SetActive(true);
-        productManager.ID.Select();
+        productManager.dropdownSelect.Select();
+        productManager.ID.text = "";
         gameObject.SetActive(false);
     }
     public void AlterarProduto2nd()
