@@ -24,6 +24,7 @@ public class CanvasController : MonoBehaviour
 
     private void Start() {
         loadProducts.LoadList(nome, quantia, content, textPrefab);
+        productManager.LoadDropdown();
     }
     void Update() {
         Escape();
@@ -31,7 +32,6 @@ public class CanvasController : MonoBehaviour
 
     public void AlterarProduto(GameObject gameObject)
     {
-        productManager.LoadDropdown();
         alterarProduto.SetActive(true);
         productManager.dropdownSelect.Select();
         productManager.ID.text = "";
@@ -63,6 +63,7 @@ public class CanvasController : MonoBehaviour
     public void MenuInicial(GameObject page)
     {
         loadProducts.LoadList(nome, quantia, content, textPrefab);
+        productManager.LoadDropdown();
         mainMenu.SetActive(true);
         page.SetActive(false);
     }

@@ -18,16 +18,16 @@ public class ProductManager : MonoBehaviour
     public InputField[] caixasOuQuantidades;
 
     [Space(10)]
-    public Button metamorfo;
+    public Button metamorfo, sobras;
     CanvasController canvasController;
     DatabaseJson databaseJson;
-
     bool active = false;
     LogJson log;
 
     Popup popup;
 
     GameObject adicionarAP, removerAP, pai;
+
     private void Awake() {
         log = FindObjectOfType<LogJson>(); 
         popup = FindObjectOfType<Popup>();
@@ -67,9 +67,15 @@ public class ProductManager : MonoBehaviour
     public void FindProduct(int type)
     {
         if(type == 1)
+        {
             metamorfo.GetComponentInChildren<Text>().text = "Adicionar";
+            sobras.gameObject.SetActive(false);
+        }
         else
+        {
             metamorfo.GetComponentInChildren<Text>().text = "Remover";
+            sobras.gameObject.SetActive(true);
+        }
         if(ID.text != "")
         {
             for(int i = 0; i < databaseJson.banco.produtos.Length; i++)
@@ -286,6 +292,10 @@ public class ProductManager : MonoBehaviour
         return null;
     }
 
+    public void SelectSobras()
+    {
+        if(index != -1) caixasOuQuantidades[1].text = (databaseJson.banco.produtos[index].amount%24).ToString();
+    }
     IEnumerator TimerPopup(string txt, bool erro, bool ctz)
     {
         yield return new WaitForSeconds(.25f);

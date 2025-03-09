@@ -33,6 +33,10 @@ public class Popup : MonoBehaviour
             permiteEnter = false;
             if(Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Escape)){ FecharPopup(); Invoke("PermitirEnter",0.25f);}
         }
+        else
+        {
+            permiteEnter = true;
+        }
     }
     public void AbrirPopup(string msg, bool erro, bool ctz)
     {
@@ -57,11 +61,5 @@ public class Popup : MonoBehaviour
     {
         popup.SetActive(false);
         
-    }
-    void PermitirEnter()
-    {
-        permiteEnter = true;
-         if(canvas.alterarProduto.activeInHierarchy)
-            {FindObjectOfType<ProductManager>().ID.Select();}
     }
 }
